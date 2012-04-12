@@ -74,10 +74,18 @@ function countdown() {
         setInterval(updateCoundown, 1000);
         document.getElementById('time').className = '';
     } else {
-        document.getElementById('time').innerHTML = remainingtime;
+        writeCountdown(remainingtime);
         document.getElementById('time').className = 'pause';
     }
 
+}
+
+// transforme 'remainingtime' in readable format and write it
+function writeCountdown (time){
+    temps = new Date();
+    temps.setTime(time*1000);
+    newTemps = ((temps.getHours()-1)+":"+temps.getMinutes()+":"+temps.getSeconds());
+    document.getElementById('time').innerHTML = newTemps;
 }
 
 function updateCoundown() {
@@ -88,7 +96,7 @@ function updateCoundown() {
         localStorage.setItem('timepause', 1);
     }
     localStorage.setItem('remainingtime', remainingtime);
-    document.getElementById('time').innerHTML = remainingtime;
+    writeCountdown(remainingtime);
 }
 
 /***************************************************
