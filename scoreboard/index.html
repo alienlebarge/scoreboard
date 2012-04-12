@@ -48,23 +48,29 @@
 
   <div id="container">
     <header>
-        <h1>Scoreboard</h1>
+        <h1 class="visuallyhidden">Scoreboard</h1>
     </header>
     <div id="main" role="main">
-        
-        <h2>Time</h2>
-        <p>00:00</p>
 
-        <h2 id="home_teamName">Home</h2>
-        <p>Score : <span id="home_score">0</span></p>
-        <h3>Penality</h3>
-        <p>time remaining : <span id="home_penality1">0</span></p>
-        <p>time remaining : <span id="home_penality2">0</span></p>
+        <div class="score">
+            <h2 class="visuallyhidden">Time</h2>
+            <p>00:00</p>
+        </div>
 
-        <h2 id="away_teamName">Away</h2>
-        <p>Score : <span id="away_score">0</span></p>
-        <p>time remaining : <span id="away_penality1">0</span></p>
-        <p>time remaining : <span id="away_penality2">0</span></p>
+        <div class="home">
+            <h2 id="home_teamName">Home</h2>
+            <p>Score : <span id="home_score">0</span></p>
+            <h3>Penality</h3>
+            <p>time remaining : <span id="home_penality1">0</span></p>
+            <p>time remaining : <span id="home_penality2">0</span></p>
+        </div>
+        <div class="away">
+            <h2 id="away_teamName">Away</h2>
+            <p>Score : <span id="away_score">0</span></p>
+            <h3>Penality</h3>
+            <p>time remaining : <span id="away_penality1">0</span></p>
+            <p>time remaining : <span id="away_penality2">0</span></p>
+        </div>
 
     </div>
 
