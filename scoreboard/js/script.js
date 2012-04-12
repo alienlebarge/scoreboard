@@ -5,7 +5,6 @@ function writeScore(team, score) {
     if ('away' == team) {
         document.getElementById('away_score').innerHTML = score;
     }
-
 }
 
 function getScore () {
@@ -32,6 +31,7 @@ function getScore () {
         localStorage.setItem('awayScore', awayScore);
     }
 
+    // write scores
     writeScore('home', homeScore);
     writeScore('away', awayScore);
 }
