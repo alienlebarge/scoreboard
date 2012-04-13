@@ -81,7 +81,7 @@ function timer(timerName) {
 
     // if the games is going on the countdown is updated
     if (localStorage.getItem('pause') == 0) {
-        setInterval(alert('hello'), 1000);
+        //setInterval(alert('hello'), 1000);
     }
 }
 
@@ -91,38 +91,41 @@ function timer(timerName) {
 
 function pause() {
 
-    // 1=pause, 0= game going on
-    var pause;
+    var pauseStatus;
 
-    // get pause value
-    if (localStorage.getItem("pause")) {
-        // if yes, we get the stored score
-        pause = localStorage.getItem('pause');
-    } else {
+    // set pause status if don't exist
+    if (!localStorage.getItem('pauseStatus')) {
         // if note we set it
-        pause = 1;
-        localStorage.setItem('pause', JSON.stringify(pause));
+        localStorage.setItem('pauseStatus', JSON.stringify('1'));
+        alert('Le statut de la pasue n est pas enregistré');
     }
 
-    alert('pause is : ' + pause);
+    alert ('Statut de la pause est à : ' + JSON.parse(localStorage.getItem('pauseStatus')));
+
+    // write the status
+    pauseText();
+
 
     // event listener
     document.getElementById('pause').onclick = function () {
-        if (pause == 0) {
-            localStorage.setItem('pause', 1);
+        if (JSON.parse(localStorage.getItem('pauseStatus')) == 0) {
+            localStorage.setItem('pauseStatus', 1);
+            pauseText();
         } else {
-            localStorage.setItem('pause', 0);
+            localStorage.setItem('pauseStatus', 0);
+            pauseText();
         }
-        init();
+
     }
 
-    // texte depending of stats
-    if (pause == 0) {
-        document.getElementById('pause').innerHTML = 'restart timer';
+}
+
+function pauseText () {
+    if (JSON.parse(localStorage.getItem('pauseStatus')) == 1) {
+        document.getElementById('pause').innerHTML = 'Start game';
     } else {
-        document.getElementById('pause').innerHTML = 'make a pause';
+        document.getElementById('pause').innerHTML = 'Pause game';
     }
-
 }
 
 /***************************************************
@@ -158,12 +161,12 @@ function init() {
     // initialisation
 
     // variables
+    // 1=pause, 0= game going on
+    pause();
+
     var gameTime = 500;
     localStorage.setItem('gameTime', JSON.stringify(gameTime));
 
-    setInterval(alert('hello'), 1000);
-
-    pause();
 
     timer('gameTime');
 
@@ -180,4 +183,3 @@ function init() {
 }
 
 window.onload = init;
-timer ();
