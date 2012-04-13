@@ -146,6 +146,37 @@ function updateTimer (timerName) {
 }
 
 /***************************************************
+ * Pause
+ */
+
+function pause() {
+
+    // 1=pause, 0= game going on
+    var pause;
+
+    // get pause value
+    if (localStorage.getItem("pause")) {
+        // if yes, we get the stored score
+        pause = localStorage.getItem('pause');
+    } else {
+        // if note we set it
+        pause = 1;
+        localStorage.setItem('pause', JSON.stringify(pause));
+    }
+
+    alert('pause is : ' + pause)
+
+    // event listener
+    document.getElementById('pause').onclick = function () {
+        if (pause == 0) {
+            localStorage.setItem('pause', 1);
+        } else {
+            localStorage.setItem('pause', 0);
+        }
+    }
+}
+
+/***************************************************
  * Reset
  */
 
@@ -183,8 +214,8 @@ function init() {
     var gameTime = 500;
     localStorage.setItem('gameTime', JSON.stringify(gameTime));
 
-    var pause = 0;
-    localStorage.setItem('pause', JSON.stringify(pause));
+    pause();
+
     timer('gameTime');
 
 
