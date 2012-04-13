@@ -45,7 +45,7 @@ function getScore () {
  */
 
 function countdown() {
-    var remainingtime;
+    var time;
     var timepause;
 
     // check if timepause allready exist
@@ -58,14 +58,14 @@ function countdown() {
         localStorage.setItem('timepause', timepause);
     }
 
-    // check if remainingtime allready exist
-    if (localStorage.getItem("remainingtime")) {
+    // check if time allready exist
+    if (localStorage.getItem("time")) {
         // if yes, we get the stored score
-        remainingtime = localStorage.getItem('remainingtime');
+        time = localStorage.getItem('time');
     } else {
         // if note we set it
-        remainingtime = 60;
-        localStorage.setItem('remainingtime', remainingtime);
+        time = 60;
+        localStorage.setItem('time', time);
     }
 
     // if the games is going on the countdown is updated
@@ -74,13 +74,13 @@ function countdown() {
         setInterval(updateCoundown, 1000);
         document.getElementById('time').className = '';
     } else {
-        writeCountdown(remainingtime);
+        writeCountdown(time);
         document.getElementById('time').className = 'pause';
     }
 
 }
 
-// transforme 'remainingtime' in readable format and write it
+// transforme 'time' in readable format and write it
 function writeCountdown (time){
     temps = new Date();
     temps.setTime(time*1000);
@@ -89,22 +89,66 @@ function writeCountdown (time){
 }
 
 function updateCoundown() {
-    remainingtime = localStorage.getItem('remainingtime');
-    remainingtime--;
-    if (remainingtime <= 0) {
+    time = localStorage.getItem('time');
+    time--;
+    if (time <= 0) {
         alert('time off');
         localStorage.setItem('timepause', 1);
     }
-    localStorage.setItem('remainingtime', remainingtime);
-    writeCountdown(remainingtime);
+    localStorage.setItem('time', time);
+    writeCountdown(time);
 }
+
+/*
+function timer(timeLeft) {
+
+    if (timeLeft > 0 && timepause != 0) {
+        //setInterval(timeLeft--, 1000);
+    }
+
+    alert('time left : ' + timeLeft);
+    return timeLeft;
+}
+*/
+
+/***************************************************
+ * Reset
+ */
+
+function resetAll (){
+
+    // set scores to 0
+    localStorage.setItem('homeScore', 0);
+    localStorage.setItem('awayScore', 0);
+
+    // set time to gameTime
+    localStorage.setItem('time', localStorage.getItem('gameTime'));
+
+    /* allready ready ...
+    localStorage.removeItem('homeP1');
+    localStorage.removeItem('homeP2');
+    localStorage.removeItem('homeP3');
+    localStorage.removeItem('awayP1');
+    localStorage.removeItem('awayP2');
+    localStorage.removeItem('awayP3');
+    */
+
+    init();
+}
+
 
 /***************************************************
  * Init
  */
 
 function init() {
+
     // initialisation
+
+    // variables
+    var gameTime = 600
+    localStorage.setItem('gameTime', JSON.stringify(gameTime));
+
     getScore();
 
     // event listener
@@ -132,9 +176,13 @@ function init() {
         localStorage.setItem('awayScore', JSON.stringify(score));
         writeScore('away', score);
     };
+    document.getElementById('resetAll').onclick = function () {
+        resetAll();
+        alert('click');
+    };
 
     countdown();
 
 }
 
-window.onload = init();
+window.onload = init;
