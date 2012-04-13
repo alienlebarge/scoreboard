@@ -39,7 +39,9 @@ function getScore () {
     };
     document.getElementById('home_scoreMinus').onclick = function () {
         score = JSON.parse(localStorage.getItem('homeScore'));
-        score--;
+        if (score > 0) {
+            score--;
+        }
         localStorage.setItem('homeScore', JSON.stringify(score));
         writeScore('home', score);
     };
@@ -51,7 +53,9 @@ function getScore () {
     };
     document.getElementById('away_scoreMinus').onclick = function () {
         score = JSON.parse(localStorage.getItem('awayScore'));
-        score--;
+        if (score > 0) {
+            score--;
+        }
         localStorage.setItem('awayScore', JSON.stringify(score));
         writeScore('away', score);
     };
@@ -125,17 +129,21 @@ function updateCoundown() {
     writeCountdown(time);
 }
 
-/*
-function timer(timeLeft) {
-
-    if (timeLeft > 0 && timepause != 0) {
-        //setInterval(timeLeft--, 1000);
-    }
-
-    alert('time left : ' + timeLeft);
-    return timeLeft;
+function timer(timerName) {
+    setInterval(updateTimer(timerName), 1000);
 }
-*/
+
+function updateTimer (timerName) {
+
+    pause = JSON.parse(localStorage.getItem('pause'));
+    timeLeft = JSON.parse(localStorage.getItem(timerName));
+
+    if ((timeLeft > 0) && (pause == 0)) {
+        timeLeft--;
+        localStorage.setItem(timerName, JSON.stringify(timeLeft));
+        alert(timerName + ' : ' + timeLeft);
+    }
+}
 
 /***************************************************
  * Reset
@@ -172,8 +180,13 @@ function init() {
     // initialisation
 
     // variables
-    var gameTime = 600
+    var gameTime = 500;
     localStorage.setItem('gameTime', JSON.stringify(gameTime));
+
+    var pause = 0;
+    localStorage.setItem('pause', JSON.stringify(pause));
+    timer('gameTime');
+
 
     getScore();
 
@@ -182,7 +195,7 @@ function init() {
         resetAll();
     };
 
-    countdown();
+    //countdown();
 
 }
 
