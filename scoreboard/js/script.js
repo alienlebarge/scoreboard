@@ -32,13 +32,13 @@ function getScore () {
 
     // event listener
     document.getElementById('home_scorePlus').onclick = function () {
-        score = JSON.parse(localStorage.getItem('homeScore'));
+        var score = JSON.parse(localStorage.getItem('homeScore'));
         score++;
         localStorage.setItem('homeScore', JSON.stringify(score));
         writeScore('home', score);
     };
     document.getElementById('home_scoreMinus').onclick = function () {
-        score = JSON.parse(localStorage.getItem('homeScore'));
+        var score = JSON.parse(localStorage.getItem('homeScore'));
         if (score > 0) {
             score--;
         }
@@ -46,13 +46,13 @@ function getScore () {
         writeScore('home', score);
     };
     document.getElementById('away_scorePlus').onclick = function () {
-        score = JSON.parse(localStorage.getItem('awayScore'));
+        var score = JSON.parse(localStorage.getItem('awayScore'));
         score++;
         localStorage.setItem('awayScore', JSON.stringify(score));
         writeScore('away', score);
     };
     document.getElementById('away_scoreMinus').onclick = function () {
-        score = JSON.parse(localStorage.getItem('awayScore'));
+        var score = JSON.parse(localStorage.getItem('awayScore'));
         if (score > 0) {
             score--;
         }
@@ -112,14 +112,14 @@ function countdown() {
 
 // transforme 'time' in readable format and write it
 function writeCountdown (time){
-    temps = new Date();
+    var temps = new Date();
     temps.setTime(time*1000);
     newTemps = ((temps.getHours()-1)+":"+temps.getMinutes()+":"+temps.getSeconds());
     document.getElementById('time').innerHTML = newTemps;
 }
 
 function updateCoundown() {
-    time = localStorage.getItem('time');
+    var time = localStorage.getItem('time');
     time--;
     if (time <= 0) {
         alert('time off');
@@ -164,7 +164,7 @@ function pause() {
         localStorage.setItem('pause', JSON.stringify(pause));
     }
 
-    alert('pause is : ' + pause)
+    alert('pause is : ' + pause);
 
     // event listener
     document.getElementById('pause').onclick = function () {
