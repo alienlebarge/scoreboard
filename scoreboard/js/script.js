@@ -2,15 +2,6 @@
  * Score Management
  */
 
-function writeScore(team, score) {
-    if ('home' == team) {
-        document.getElementById('home_score').innerHTML = score;
-    }
-    if ('away' == team) {
-        document.getElementById('away_score').innerHTML = score;
-    }
-}
-
 function getScore () {
     var homeScore;
     var awayScore;
@@ -38,6 +29,41 @@ function getScore () {
     // write scores
     writeScore('home', homeScore);
     writeScore('away', awayScore);
+
+    // event listener
+    document.getElementById('home_scorePlus').onclick = function () {
+        score = JSON.parse(localStorage.getItem('homeScore'));
+        score++;
+        localStorage.setItem('homeScore', JSON.stringify(score));
+        writeScore('home', score);
+    };
+    document.getElementById('home_scoreMinus').onclick = function () {
+        score = JSON.parse(localStorage.getItem('homeScore'));
+        score--;
+        localStorage.setItem('homeScore', JSON.stringify(score));
+        writeScore('home', score);
+    };
+    document.getElementById('away_scorePlus').onclick = function () {
+        score = JSON.parse(localStorage.getItem('awayScore'));
+        score++;
+        localStorage.setItem('awayScore', JSON.stringify(score));
+        writeScore('away', score);
+    };
+    document.getElementById('away_scoreMinus').onclick = function () {
+        score = JSON.parse(localStorage.getItem('awayScore'));
+        score--;
+        localStorage.setItem('awayScore', JSON.stringify(score));
+        writeScore('away', score);
+    };
+}
+
+function writeScore(team, score) {
+    if ('home' == team) {
+        document.getElementById('home_score').innerHTML = score;
+    }
+    if ('away' == team) {
+        document.getElementById('away_score').innerHTML = score;
+    }
 }
 
 /***************************************************
@@ -151,34 +177,9 @@ function init() {
 
     getScore();
 
-    // event listener
-    document.getElementById('home_scorePlus').onclick = function () {
-        score = JSON.parse(localStorage.getItem('homeScore'));
-        score++;
-        localStorage.setItem('homeScore', JSON.stringify(score));
-        writeScore('home', score);
-    };
-    document.getElementById('home_scoreMinus').onclick = function () {
-        score = JSON.parse(localStorage.getItem('homeScore'));
-        score--;
-        localStorage.setItem('homeScore', JSON.stringify(score));
-        writeScore('home', score);
-    };
-    document.getElementById('away_scorePlus').onclick = function () {
-        score = JSON.parse(localStorage.getItem('awayScore'));
-        score++;
-        localStorage.setItem('awayScore', JSON.stringify(score));
-        writeScore('away', score);
-    };
-    document.getElementById('away_scoreMinus').onclick = function () {
-        score = JSON.parse(localStorage.getItem('awayScore'));
-        score--;
-        localStorage.setItem('awayScore', JSON.stringify(score));
-        writeScore('away', score);
-    };
+    // resetAll
     document.getElementById('resetAll').onclick = function () {
         resetAll();
-        alert('click');
     };
 
     countdown();
