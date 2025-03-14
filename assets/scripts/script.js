@@ -190,13 +190,11 @@ function addPenalty(team) {
     document.getElementById('penaltyInput').style.display = 'flex';
     document.getElementById('playerNumber').value = '';
     document.getElementById('penaltyTime').value = '2';
-    document.getElementById('penaltyReason').value = '';
 }
 
 function confirmPenalty() {
     const playerNumber = document.getElementById('playerNumber').value;
     const penaltyTime = parseInt(document.getElementById('penaltyTime').value);
-    const reason = document.getElementById('penaltyReason').value;
 
     if (!playerNumber || !penaltyTime) return;
 
@@ -204,7 +202,6 @@ function confirmPenalty() {
         player: playerNumber,
         timeLeft: penaltyTime * 60,
         originalTime: penaltyTime * 60,
-        reason: reason,
         id: Date.now()
     };
 
