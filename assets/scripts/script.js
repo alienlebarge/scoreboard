@@ -391,5 +391,62 @@ setInterval(() => {
     }
 }, 1000);
 
+// Variables pour la gestion de l'ajustement des pénalités
+let currentPenaltyToAdjust = {
+    team: null,
+    id: null
+};
+
+function adjustPenaltyTime(team, penaltyId) {
+    // Stocker la pénalité en cours d'ajustement
+    currentPenaltyToAdjust.team = team;
+    currentPenaltyToAdjust.id = penaltyId;
+
+    // Trouver la pénalité
+    const penalty = team === 1 
+        ? gameState.team1.penalties.find(p => p.id === penaltyId)
+        : gameState.team2.penalties.find(p => p.id === penaltyId);
+
+    if (penalty) {
+        // Remplir les champs avec les valeurs actuelles
+        document.getElementById('adjustPenaltyMinutes').value = Math.floor(penalty.timeLeft / 60);
+        document.getElementById('adjustPenaltySeconds').value = penalty.timeLeft % 60;
+        // Afficher la modale
+        document.getElementById('penaltyAdjustModal').style.display = 'flex';
+    }
+}
+
+function confirmPenaltyTimeAdjust() {
+    const minutes = parseInt(document.getElementById('adjustPenaltyMinutes').value);
+    const seconds = parseInt(document.getElementById('adjustPenaltySeconds').value);
+    
+    if (!isNaN(minutes) && !isNaN(seconds) && minutes >= 0 && seconds >= 0 && seconds < 60) {
+        const newTimeLeft = (minutes * 60) + seconds;
+        
+        // Mettre à jour la pénalité
+        if (currentPenaltyToAdjust.team === 1) {
+            const penaltyIndex = gameState.team1.penalties.findIndex(p => p.id === currentPenaltyToAdjust.id);
+            if (penaltyIndex !== -1) {
+                gameState.team1.penalties[penaltyIndex].timeLeft = newTimeLeft;
+            }
+        } else {
+            const penaltyIndex = gameState.team2.penalties.findIndex(p => p.id === currentPenaltyToAdjust.id);
+            if (penaltyIndex !== -1) {
+                gameState.team2.penalties[penaltyIndex].timeLeft = newTimeLeft;
+            }
+        }
+        
+        // Fermer la modale et mettre à jour l'interface
+        document.getElementById('penaltyAdjustModal').style.display = 'none';
+        updateUI();
+        saveGameState();
+    }
+}
+
+function cancelPenaltyTimeAdjust() {
+    document.getElementById('penaltyAdjustModal').style.display = 'none';
+    currentPenaltyToAdjust = { team: null, id: null };
+}
+
 // Chargement initial
 document.addEventListener('DOMContentLoaded', loadGameState); 

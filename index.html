@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <!-- Métadonnées de base -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Tableau des scores pour match sportif avec gestion du temps et des pénalités">
     <title>Tableau des Scores</title>
+    <!-- Lien vers la feuille de style -->
     <link rel="stylesheet" href="assets/styles/styles.css">
 </head>
 <body>
+    <!-- Conteneur principal -->
     <div class="container" role="main">
         <h1>Tableau des Scores</h1>
         
+        <!-- Section de configuration initiale du match -->
         <section class="configuration" aria-labelledby="config-title">
+            <!-- Titre caché visuellement mais accessible aux lecteurs d'écran -->
             <h2 id="config-title" class="sr-only">Configuration du match</h2>
+            
+            <!-- Configuration des équipes -->
             <div class="team-config">
                 <div>
                     <label for="team1">Équipe 1 :</label>
@@ -24,6 +31,7 @@
                 </div>
             </div>
             
+            <!-- Configuration du temps et contrôles principaux -->
             <div class="time-config">
                 <label for="halfTime">Durée mi-temps (minutes) :</label>
                 <input type="number" id="halfTime" value="45" min="1" aria-required="true">
@@ -32,7 +40,9 @@
             </div>
         </section>
 
+        <!-- Tableau des scores principal -->
         <section class="scoreboard" aria-label="Tableau des scores">
+            <!-- Zone équipe 1 -->
             <div class="team team1" role="region" aria-labelledby="team1Name">
                 <h2 id="team1Name">Équipe 1</h2>
                 <div class="score" id="score1" role="timer" aria-label="Score équipe 1">0</div>
@@ -41,9 +51,11 @@
                     <button onclick="addGoal(1)" class="add-goal" aria-label="Ajouter un but à l'équipe 1">+ But</button>
                     <button onclick="addPenalty(1)" aria-label="Ajouter une pénalité à l'équipe 1">+ Pénalité</button>
                 </div>
+                <!-- Zone d'affichage des pénalités de l'équipe 1 -->
                 <div class="penalties" id="penalties1" role="list" aria-label="Liste des pénalités équipe 1"></div>
             </div>
 
+            <!-- Zone centrale avec chronomètre et contrôles du match -->
             <div class="match-info" role="region" aria-label="Informations du match">
                 <div class="timer" id="timer" role="timer" aria-label="Temps restant">45:00</div>
                 <div class="period" id="period" aria-live="polite">1ère Mi-temps</div>
@@ -53,6 +65,7 @@
                 </div>
             </div>
 
+            <!-- Zone équipe 2 (structure identique à l'équipe 1) -->
             <div class="team team2" role="region" aria-labelledby="team2Name">
                 <h2 id="team2Name">Équipe 2</h2>
                 <div class="score" id="score2" role="timer" aria-label="Score équipe 2">0</div>
@@ -65,6 +78,8 @@
             </div>
         </section>
 
+        <!-- Modales (fenêtres popup) -->
+        <!-- Modale pour l'ajout d'une pénalité -->
         <div class="penalty-input" id="penaltyInput" role="dialog" aria-labelledby="penaltyTitle" aria-modal="true" style="display: none;">
             <div class="penalty-form">
                 <h3 id="penaltyTitle">Ajouter une pénalité</h3>
@@ -79,6 +94,7 @@
             </div>
         </div>
 
+        <!-- Modale pour l'ajustement du temps de jeu -->
         <div class="time-adjust-modal" id="timeAdjustModal" role="dialog" aria-labelledby="timeAdjustTitle" aria-modal="true" style="display: none;">
             <div class="time-adjust-form">
                 <h3 id="timeAdjustTitle">Ajuster le temps</h3>
@@ -95,6 +111,7 @@
             </div>
         </div>
 
+        <!-- Modale pour l'ajustement du temps d'une pénalité -->
         <div class="penalty-adjust-modal" id="penaltyAdjustModal" role="dialog" aria-labelledby="penaltyAdjustTitle" aria-modal="true" style="display: none;">
             <div class="time-adjust-form">
                 <h3 id="penaltyAdjustTitle">Ajuster le temps de pénalité</h3>
@@ -111,7 +128,11 @@
             </div>
         </div>
     </div>
+
+    <!-- Scripts -->
+    <!-- Script principal de l'application -->
     <script src="assets/scripts/script.js"></script>
+    <!-- Bibliothèque pour les effets de confettis -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </body>
 </html> 
