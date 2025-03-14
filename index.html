@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tableau des scores pour match sportif avec gestion du temps et des pénalités">
+    <title>Tableau des Scores</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container" role="main">
+        <h1>Tableau des Scores</h1>
+        
+        <section class="configuration" aria-labelledby="config-title">
+            <h2 id="config-title" class="sr-only">Configuration du match</h2>
+            <div class="team-config">
+                <div>
+                    <label for="team1">Équipe 1 :</label>
+                    <input type="text" id="team1" placeholder="Nom de l'équipe 1" aria-required="true">
+                </div>
+                <div>
+                    <label for="team2">Équipe 2 :</label>
+                    <input type="text" id="team2" placeholder="Nom de l'équipe 2" aria-required="true">
+                </div>
+            </div>
+            
+            <div class="time-config">
+                <label for="halfTime">Durée mi-temps (minutes) :</label>
+                <input type="number" id="halfTime" value="45" min="1" aria-required="true">
+                <button onclick="startGame()" aria-label="Démarrer le match">Démarrer le Match</button>
+            </div>
+        </section>
+
+        <section class="scoreboard" aria-label="Tableau des scores">
+            <div class="team team1" role="region" aria-labelledby="team1Name">
+                <h2 id="team1Name">Équipe 1</h2>
+                <div class="score" id="score1" role="timer" aria-label="Score équipe 1">0</div>
+                <div class="controls">
+                    <button onclick="removeGoal(1)" class="remove-goal" aria-label="Retirer un but à l'équipe 1">- But</button>
+                    <button onclick="addGoal(1)" class="add-goal" aria-label="Ajouter un but à l'équipe 1">+ But</button>
+                    <button onclick="addPenalty(1)" aria-label="Ajouter une pénalité à l'équipe 1">+ Pénalité</button>
+                </div>
+                <div class="penalties" id="penalties1" role="list" aria-label="Liste des pénalités équipe 1"></div>
+            </div>
+
+            <div class="match-info" role="region" aria-label="Informations du match">
+                <div class="timer" id="timer" role="timer" aria-label="Temps restant">45:00</div>
+                <div class="period" id="period" aria-live="polite">1ère Mi-temps</div>
+                <button id="toggleTimer" onclick="toggleTimer()" aria-label="Démarrer ou mettre en pause le chronomètre">Démarrer</button>
+                <div class="time-controls">
+                    <button onclick="showTimeAdjust()" class="time-adjust" aria-label="Ouvrir la fenêtre d'ajustement du temps">Ajuster le temps</button>
+                </div>
+            </div>
+
+            <div class="team team2" role="region" aria-labelledby="team2Name">
+                <h2 id="team2Name">Équipe 2</h2>
+                <div class="score" id="score2" role="timer" aria-label="Score équipe 2">0</div>
+                <div class="controls">
+                    <button onclick="removeGoal(2)" class="remove-goal" aria-label="Retirer un but à l'équipe 2">- But</button>
+                    <button onclick="addGoal(2)" class="add-goal" aria-label="Ajouter un but à l'équipe 2">+ But</button>
+                    <button onclick="addPenalty(2)" aria-label="Ajouter une pénalité à l'équipe 2">+ Pénalité</button>
+                </div>
+                <div class="penalties" id="penalties2" role="list" aria-label="Liste des pénalités équipe 2"></div>
+            </div>
+        </section>
+
+        <div class="penalty-input" id="penaltyInput" role="dialog" aria-labelledby="penaltyTitle" aria-modal="true" style="display: none;">
+            <div class="penalty-form">
+                <h3 id="penaltyTitle">Ajouter une pénalité</h3>
+                <label for="playerNumber">Numéro du joueur :</label>
+                <input type="text" id="playerNumber" aria-required="true">
+                <label for="penaltyTime">Durée (minutes) :</label>
+                <input type="number" id="penaltyTime" value="2" aria-required="true">
+                <label for="penaltyReason">Raison :</label>
+                <input type="text" id="penaltyReason">
+                <div class="penalty-buttons">
+                    <button onclick="confirmPenalty()" aria-label="Confirmer la pénalité">Confirmer</button>
+                    <button onclick="cancelPenalty()" aria-label="Annuler la pénalité">Annuler</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="time-adjust-modal" id="timeAdjustModal" role="dialog" aria-labelledby="timeAdjustTitle" aria-modal="true" style="display: none;">
+            <div class="time-adjust-form">
+                <h3 id="timeAdjustTitle">Ajuster le temps</h3>
+                <div class="time-inputs">
+                    <label for="adjustMinutes">Minutes :</label>
+                    <input type="number" id="adjustMinutes" min="0" aria-required="true">
+                    <label for="adjustSeconds">Secondes :</label>
+                    <input type="number" id="adjustSeconds" min="0" max="59" aria-required="true">
+                </div>
+                <div class="time-adjust-buttons">
+                    <button onclick="confirmTimeAdjust()" aria-label="Confirmer l'ajustement du temps">Confirmer</button>
+                    <button onclick="cancelTimeAdjust()" aria-label="Annuler l'ajustement du temps">Annuler</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="penalty-adjust-modal" id="penaltyAdjustModal" role="dialog" aria-labelledby="penaltyAdjustTitle" aria-modal="true" style="display: none;">
+            <div class="time-adjust-form">
+                <h3 id="penaltyAdjustTitle">Ajuster le temps de pénalité</h3>
+                <div class="time-inputs">
+                    <label for="adjustPenaltyMinutes">Minutes :</label>
+                    <input type="number" id="adjustPenaltyMinutes" min="0" aria-required="true">
+                    <label for="adjustPenaltySeconds">Secondes :</label>
+                    <input type="number" id="adjustPenaltySeconds" min="0" max="59" aria-required="true">
+                </div>
+                <div class="time-adjust-buttons">
+                    <button onclick="confirmPenaltyTimeAdjust()" aria-label="Confirmer l'ajustement de la pénalité">Confirmer</button>
+                    <button onclick="cancelPenaltyTimeAdjust()" aria-label="Annuler l'ajustement de la pénalité">Annuler</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,335 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f0f2f5;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    color: #0D47A1;
+    margin-bottom: 30px;
+}
+
+.configuration {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.team-config {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.team-config div {
+    flex: 1;
+    margin: 0 10px;
+}
+
+.time-config {
+    text-align: center;
+}
+
+input {
+    padding: 8px;
+    border: 2px solid #757575;
+    border-radius: 4px;
+    margin: 5px;
+    width: 200px;
+}
+
+button {
+    background-color: #0D47A1;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-weight: 500;
+}
+
+button:hover {
+    background-color: #1565C0;
+}
+
+.scoreboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.team {
+    flex: 1;
+    text-align: center;
+}
+
+.match-info {
+    text-align: center;
+    padding: 0 20px;
+}
+
+.timer {
+    font-size: 48px;
+    font-weight: bold;
+    color: #0D47A1;
+    margin-bottom: 10px;
+}
+
+.period {
+    font-size: 18px;
+    color: #424242;
+    margin-bottom: 10px;
+}
+
+.score {
+    font-size: 72px;
+    font-weight: bold;
+    color: #0D47A1;
+    margin: 20px 0;
+}
+
+.controls {
+    margin: 15px 0;
+}
+
+.controls button {
+    margin: 0 5px;
+}
+
+.remove-goal {
+    background-color: #C62828;
+}
+
+.remove-goal:hover {
+    background-color: #B71C1C;
+}
+
+.add-goal {
+    background-color: #2E7D32;
+}
+
+.add-goal:hover {
+    background-color: #1B5E20;
+}
+
+.penalties {
+    margin-top: 20px;
+}
+
+.penalty-item {
+    background-color: #FFEBEE;
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 4px;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #000000;
+}
+
+.penalty-item[data-time-critical="true"] {
+    color: #B71C1C;
+    font-weight: bold;
+}
+
+.adjust-penalty-time {
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #455a64;
+    transition: transform 0.2s;
+}
+
+.adjust-penalty-time:hover {
+    transform: scale(1.2);
+    background: none;
+}
+
+.penalty-adjust-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.penalty-input {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.penalty-form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+}
+
+.penalty-form h3 {
+    margin-bottom: 15px;
+    color: #1a237e;
+}
+
+.penalty-form input {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.penalty-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.time-controls {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.time-adjust {
+    background-color: #37474F;
+    font-size: 0.9em;
+    padding: 5px 10px;
+}
+
+.time-adjust:hover {
+    background-color: #263238;
+}
+
+.time-adjust-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.time-adjust-form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+}
+
+.time-adjust-form h3 {
+    margin-bottom: 15px;
+    color: #1a237e;
+    text-align: center;
+}
+
+.time-inputs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.time-inputs input {
+    width: 50%;
+}
+
+.time-adjust-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+    .scoreboard {
+        flex-direction: column;
+    }
+    
+    .team {
+        margin: 20px 0;
+    }
+    
+    .team-config {
+        flex-direction: column;
+    }
+}
+
+/* Styles pour les lecteurs d'écran */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Focus visible pour l'accessibilité */
+:focus {
+    outline: 3px solid #4A90E2;
+    outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+:focus-visible {
+    outline: 3px solid #4A90E2;
+    outline-offset: 2px;
+}
+
+/* Labels et textes */
+label {
+    color: #212121;
+    font-weight: 500;
+}
+
+input:focus {
+    border-color: #0D47A1;
+    box-shadow: 0 0 0 2px rgba(13, 71, 161, 0.2);
+}
+
+/* Message d'erreur */
+.error-message {
+    color: #C62828;
+    font-weight: bold;
+    margin-top: 5px;
+} 
