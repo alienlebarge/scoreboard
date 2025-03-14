@@ -183,19 +183,55 @@ function removeGoal(team) {
 // Gestion des pénalités
 let currentPenaltyTeam = null;
 
-function addPenalty(team) {
+// Afficher/masquer le formulaire de pénalité
+function togglePenaltyForm(team) {
     if (!gameState.gameStarted) return;
     
-    currentPenaltyTeam = team;
-    openModal('penaltyInput');
-    document.getElementById('playerNumber').value = '';
-    document.getElementById('penaltyTime').value = '2';
+    const penaltyForm = document.getElementById(`penaltyInput${team}`);
+    if (penaltyForm.style.display === 'block') {
+        penaltyForm.style.display = 'none';
+    } else {
+        // Cacher l'autre formulaire si ouvert
+        document.getElementById(`penaltyInput${team === 1 ? 2 : 1}`).style.display = 'none';
+        
+        // Réinitialiser et afficher le formulaire
+        document.getElementById(`playerNumber${team}`).value = '';
+        document.getElementById(`penaltyTime${team}`).value = '2';
+        penaltyForm.style.display = 'block';
+        
+        // Focus sur le premier champ pour l'accessibilité
+        document.getElementById(`playerNumber${team}`).focus();
+    }
 }
 
-function cancelPenalty() {
-    closeModal('penaltyInput');
+// Confirmer l'ajout d'une pénalité
+function confirmPenalty(team) {
+    const playerNumber = document.getElementById(`playerNumber${team}`).value;
+    const penaltyTime = parseInt(document.getElementById(`penaltyTime${team}`).value);
+
+    if (!playerNumber || !penaltyTime) return;
+
+    const penalty = {
+        player: playerNumber,
+        timeLeft: penaltyTime * 60,
+        originalTime: penaltyTime * 60,
+        id: Date.now()
+    };
+
+    if (team === 1) {
+        gameState.team1.penalties.push(penalty);
+    } else {
+        gameState.team2.penalties.push(penalty);
+    }
+
+    // Cacher le formulaire
+    document.getElementById(`penaltyInput${team}`).style.display = 'none';
+    
+    updateUI();
+    saveGameState();
 }
 
+// Mise à jour de l'affichage des pénalités
 function updatePenaltiesDisplay() {
     const penalties1 = document.getElementById('penalties1');
     const penalties2 = document.getElementById('penalties2');
@@ -211,9 +247,22 @@ function updatePenaltiesDisplay() {
             div.className = 'penalty';
             div.innerHTML = `
                 <span>#${penalty.player} - ${minutes}:${String(seconds).padStart(2, '0')}</span>
-                <button onclick="adjustPenaltyTime(1, ${penalty.id})" class="adjust-penalty">⚙️</button>
-                <button onclick="removePenalty(1, ${penalty.id})" class="remove-penalty">❌</button>
+                <button type="button" class="adjust-penalty" aria-label="Ajuster la pénalité">⚙️</button>
+                <button type="button" class="remove-penalty" aria-label="Supprimer la pénalité">❌</button>
             `;
+            
+            // Ajouter les gestionnaires d'événements directement
+            const adjustButton = div.querySelector('.adjust-penalty');
+            const removeButton = div.querySelector('.remove-penalty');
+            
+            adjustButton.addEventListener('click', function() {
+                togglePenaltyAdjustForm(1, penalty.id);
+            });
+            
+            removeButton.addEventListener('click', function() {
+                removePenalty(1, penalty.id);
+            });
+            
             penalties1.appendChild(div);
         }
     });
@@ -226,31 +275,68 @@ function updatePenaltiesDisplay() {
             div.className = 'penalty';
             div.innerHTML = `
                 <span>#${penalty.player} - ${minutes}:${String(seconds).padStart(2, '0')}</span>
-                <button onclick="adjustPenaltyTime(2, ${penalty.id})" class="adjust-penalty">⚙️</button>
-                <button onclick="removePenalty(2, ${penalty.id})" class="remove-penalty">❌</button>
+                <button type="button" class="adjust-penalty" aria-label="Ajuster la pénalité">⚙️</button>
+                <button type="button" class="remove-penalty" aria-label="Supprimer la pénalité">❌</button>
             `;
+            
+            // Ajouter les gestionnaires d'événements directement
+            const adjustButton = div.querySelector('.adjust-penalty');
+            const removeButton = div.querySelector('.remove-penalty');
+            
+            adjustButton.addEventListener('click', function() {
+                togglePenaltyAdjustForm(2, penalty.id);
+            });
+            
+            removeButton.addEventListener('click', function() {
+                removePenalty(2, penalty.id);
+            });
+            
             penalties2.appendChild(div);
         }
     });
 }
 
+// Supprimer une pénalité
 function removePenalty(team, penaltyId) {
+    // Fermer tous les formulaires ouverts
+    document.querySelectorAll('.penalty-input, .penalty-adjust-modal, .time-adjust-modal').forEach(form => {
+        form.style.display = 'none';
+    });
+    
+    // Supprimer la pénalité
     if (team === 1) {
         gameState.team1.penalties = gameState.team1.penalties.filter(p => p.id !== penaltyId);
     } else {
         gameState.team2.penalties = gameState.team2.penalties.filter(p => p.id !== penaltyId);
     }
+    
+    // Mettre à jour l'interface et sauvegarder
     updateUI();
     saveGameState();
 }
 
 // Gestion du temps
-function showTimeAdjust() {
-    openModal('timeAdjustModal');
-    document.getElementById('adjustMinutes').value = gameState.timer.minutes;
-    document.getElementById('adjustSeconds').value = gameState.timer.seconds;
+function toggleTimeAdjustForm() {
+    const timeForm = document.getElementById('timeAdjustForm');
+    if (timeForm.style.display === 'block') {
+        timeForm.style.display = 'none';
+    } else {
+        // Cacher tous les autres formulaires
+        document.querySelectorAll('.penalty-input, .penalty-adjust-modal').forEach(form => {
+            form.style.display = 'none';
+        });
+        
+        // Remplir et afficher le formulaire
+        document.getElementById('adjustMinutes').value = gameState.timer.minutes;
+        document.getElementById('adjustSeconds').value = gameState.timer.seconds;
+        timeForm.style.display = 'block';
+        
+        // Focus sur le premier champ pour l'accessibilité
+        document.getElementById('adjustMinutes').focus();
+    }
 }
 
+// Ajuster les pénalités en fonction du changement de temps
 function adjustPenaltiesTime(oldMinutes, oldSeconds, newMinutes, newSeconds) {
     const oldTotalSeconds = oldMinutes * 60 + oldSeconds;
     const newTotalSeconds = newMinutes * 60 + newSeconds;
@@ -275,8 +361,96 @@ function adjustPenaltiesTime(oldMinutes, oldSeconds, newMinutes, newSeconds) {
     });
 }
 
-function cancelTimeAdjust() {
-    closeModal('timeAdjustModal');
+// Confirmer l'ajustement du temps
+function confirmTimeAdjust() {
+    const minutes = parseInt(document.getElementById('adjustMinutes').value);
+    const seconds = parseInt(document.getElementById('adjustSeconds').value);
+    
+    if (!isNaN(minutes) && !isNaN(seconds) && minutes >= 0 && seconds >= 0 && seconds < 60) {
+        adjustPenaltiesTime(
+            gameState.timer.minutes,
+            gameState.timer.seconds,
+            minutes,
+            seconds
+        );
+        
+        gameState.timer.minutes = minutes;
+        gameState.timer.seconds = seconds;
+        
+        document.getElementById('timeAdjustForm').style.display = 'none';
+        updateUI();
+        saveGameState();
+    }
+}
+
+// Variables pour la gestion de l'ajustement des pénalités
+let currentPenaltyToAdjust = {
+    team: null,
+    id: null
+};
+
+// Afficher/masquer le formulaire d'ajustement de pénalité
+function togglePenaltyAdjustForm(team, penaltyId) {
+    const penaltyAdjustForm = document.getElementById(`penaltyAdjustForm${team}`);
+    
+    if (penaltyAdjustForm.style.display === 'block' && currentPenaltyToAdjust.id === penaltyId) {
+        // Si le même formulaire est déjà ouvert pour la même pénalité, le fermer
+        penaltyAdjustForm.style.display = 'none';
+        currentPenaltyToAdjust = { team: null, id: null };
+    } else {
+        // Cacher tous les autres formulaires
+        document.querySelectorAll('.penalty-input, .penalty-adjust-modal, .time-adjust-modal').forEach(form => {
+            form.style.display = 'none';
+        });
+        
+        // Stocker la pénalité en cours d'ajustement
+        currentPenaltyToAdjust.team = team;
+        currentPenaltyToAdjust.id = penaltyId;
+
+        // Trouver la pénalité
+        const penalty = team === 1 
+            ? gameState.team1.penalties.find(p => p.id === penaltyId)
+            : gameState.team2.penalties.find(p => p.id === penaltyId);
+
+        if (penalty) {
+            // Remplir les champs avec les valeurs actuelles
+            document.getElementById(`adjustPenaltyMinutes${team}`).value = Math.floor(penalty.timeLeft / 60);
+            document.getElementById(`adjustPenaltySeconds${team}`).value = penalty.timeLeft % 60;
+            
+            // Afficher le formulaire
+            penaltyAdjustForm.style.display = 'block';
+            
+            // Focus sur le premier champ pour l'accessibilité
+            document.getElementById(`adjustPenaltyMinutes${team}`).focus();
+        }
+    }
+}
+
+// Confirmer l'ajustement du temps de pénalité
+function confirmPenaltyTimeAdjust(team) {
+    const minutes = parseInt(document.getElementById(`adjustPenaltyMinutes${team}`).value);
+    const seconds = parseInt(document.getElementById(`adjustPenaltySeconds${team}`).value);
+    
+    if (!isNaN(minutes) && !isNaN(seconds) && minutes >= 0 && seconds >= 0 && seconds < 60) {
+        const newTimeLeft = (minutes * 60) + seconds;
+        
+        if (team === 1) {
+            const penaltyIndex = gameState.team1.penalties.findIndex(p => p.id === currentPenaltyToAdjust.id);
+            if (penaltyIndex !== -1) {
+                gameState.team1.penalties[penaltyIndex].timeLeft = newTimeLeft;
+            }
+        } else {
+            const penaltyIndex = gameState.team2.penalties.findIndex(p => p.id === currentPenaltyToAdjust.id);
+            if (penaltyIndex !== -1) {
+                gameState.team2.penalties[penaltyIndex].timeLeft = newTimeLeft;
+            }
+        }
+        
+        document.getElementById(`penaltyAdjustForm${team}`).style.display = 'none';
+        currentPenaltyToAdjust = { team: null, id: null };
+        updateUI();
+        saveGameState();
+    }
 }
 
 // Gestion du match
@@ -285,8 +459,8 @@ function startGame() {
     const team2Name = document.getElementById('team2').value.trim();
     const halfTime = parseInt(document.getElementById('halfTime').value);
 
-    if (!team1Name || !team2Name || isNaN(halfTime) || halfTime <= 0) {
-        alert('Veuillez remplir tous les champs correctement');
+    if (isNaN(halfTime) || halfTime <= 0) {
+        alert('Veuillez entrer une durée de mi-temps valide');
         return;
     }
 
@@ -344,178 +518,61 @@ setInterval(() => {
     }
 }, 1000);
 
-// Variables pour la gestion de l'ajustement des pénalités
-let currentPenaltyToAdjust = {
-    team: null,
-    id: null
-};
-
-function adjustPenaltyTime(team, penaltyId) {
-    currentPenaltyToAdjust.team = team;
-    currentPenaltyToAdjust.id = penaltyId;
-
-    const penalty = team === 1 
-        ? gameState.team1.penalties.find(p => p.id === penaltyId)
-        : gameState.team2.penalties.find(p => p.id === penaltyId);
-
-    if (penalty) {
-        document.getElementById('adjustPenaltyMinutes').value = Math.floor(penalty.timeLeft / 60);
-        document.getElementById('adjustPenaltySeconds').value = penalty.timeLeft % 60;
-        openModal('penaltyAdjustModal');
-    }
-}
-
-function cancelPenaltyTimeAdjust() {
-    closeModal('penaltyAdjustModal');
-    currentPenaltyToAdjust = { team: null, id: null };
-}
-
-function confirmPenalty() {
-    const playerNumber = document.getElementById('playerNumber').value;
-    const penaltyTime = parseInt(document.getElementById('penaltyTime').value);
-
-    if (!playerNumber || !penaltyTime) return;
-
-    const penalty = {
-        player: playerNumber,
-        timeLeft: penaltyTime * 60,
-        originalTime: penaltyTime * 60,
-        id: Date.now()
-    };
-
-    if (currentPenaltyTeam === 1) {
-        gameState.team1.penalties.push(penalty);
-    } else {
-        gameState.team2.penalties.push(penalty);
-    }
-
-    closeModal('penaltyInput');
-    updateUI();
-    saveGameState();
-}
-
-function confirmTimeAdjust() {
-    const minutes = parseInt(document.getElementById('adjustMinutes').value);
-    const seconds = parseInt(document.getElementById('adjustSeconds').value);
-    
-    if (!isNaN(minutes) && !isNaN(seconds) && minutes >= 0 && seconds >= 0 && seconds < 60) {
-        adjustPenaltiesTime(
-            gameState.timer.minutes,
-            gameState.timer.seconds,
-            minutes,
-            seconds
-        );
-        
-        gameState.timer.minutes = minutes;
-        gameState.timer.seconds = seconds;
-        
-        closeModal('timeAdjustModal');
-        updateUI();
-        saveGameState();
-    }
-}
-
-function confirmPenaltyTimeAdjust() {
-    const minutes = parseInt(document.getElementById('adjustPenaltyMinutes').value);
-    const seconds = parseInt(document.getElementById('adjustPenaltySeconds').value);
-    
-    if (!isNaN(minutes) && !isNaN(seconds) && minutes >= 0 && seconds >= 0 && seconds < 60) {
-        const newTimeLeft = (minutes * 60) + seconds;
-        
-        if (currentPenaltyToAdjust.team === 1) {
-            const penaltyIndex = gameState.team1.penalties.findIndex(p => p.id === currentPenaltyToAdjust.id);
-            if (penaltyIndex !== -1) {
-                gameState.team1.penalties[penaltyIndex].timeLeft = newTimeLeft;
-            }
-        } else {
-            const penaltyIndex = gameState.team2.penalties.findIndex(p => p.id === currentPenaltyToAdjust.id);
-            if (penaltyIndex !== -1) {
-                gameState.team2.penalties[penaltyIndex].timeLeft = newTimeLeft;
-            }
-        }
-        
-        closeModal('penaltyAdjustModal');
-        updateUI();
-        saveGameState();
-    }
-}
-
-// Gestion des modales sur mobile
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (!modal) return;
-
-    // Créer un conteneur modal si nécessaire
-    let modalContainer = modal.querySelector('.modal-container');
-    if (!modalContainer) {
-        modalContainer = document.createElement('div');
-        modalContainer.className = 'modal-container';
-        while (modal.firstChild) {
-            modalContainer.appendChild(modal.firstChild);
-        }
-        modal.appendChild(modalContainer);
-    }
-
-    modal.style.display = 'flex';
-    document.body.classList.add('modal-open');
-
-    // Empêcher le scroll sur le body mais permettre le scroll dans la modale
-    document.body.style.top = `-${window.scrollY}px`;
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
-}
-
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (!modal) return;
-
-    modal.style.display = 'none';
-    document.body.classList.remove('modal-open');
-
-    // Restaurer la position du scroll
-    const scrollY = document.body.style.top;
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.width = '';
-    window.scrollTo(0, parseInt(scrollY || '0') * -1);
-}
-
-// Amélioration de la gestion des événements pour le mobile
+// Initialisation des formulaires au chargement
 document.addEventListener('DOMContentLoaded', function() {
-    // Gestionnaire d'événements pour les clics/touches sur les modales
-    const handleModalClick = function(event) {
-        const modals = ['penaltyInput', 'timeAdjustModal', 'penaltyAdjustModal'];
+    // Charger l'état du jeu
+    loadGameState();
+    
+    // Cacher tous les formulaires au démarrage
+    document.querySelectorAll('.penalty-input, .penalty-adjust-modal, .time-adjust-modal').forEach(form => {
+        form.style.display = 'none';
+    });
+    
+    // Ajouter des gestionnaires d'événements pour les touches clavier
+    document.addEventListener('keydown', function(event) {
+        // Si un formulaire est ouvert ou si un champ de saisie est actif, ne pas intercepter les touches
+        if (document.activeElement.tagName === 'INPUT' || 
+            document.activeElement.tagName === 'TEXTAREA' ||
+            document.activeElement.tagName === 'SELECT') {
+            return;
+        }
         
-        modals.forEach(modalId => {
-            const modal = document.getElementById(modalId);
-            if (!modal) return;
-
-            const modalContent = modal.querySelector('.penalty-form, .time-adjust-form');
-            if (event.target === modal && (!modalContent || !modalContent.contains(event.target))) {
-                closeModal(modalId);
-            }
-        });
-    };
-
-    // Ajouter les gestionnaires d'événements pour mobile et desktop
-    document.addEventListener('click', handleModalClick);
-    document.addEventListener('touchend', function(event) {
-        // Empêcher le double événement sur mobile (touch + click)
-        event.preventDefault();
-        handleModalClick(event);
+        // Gestion des touches
+        switch (event.key) {
+            case 'Escape':
+                // Fermer tous les formulaires ouverts
+                document.querySelectorAll('.penalty-input, .penalty-adjust-modal, .time-adjust-modal').forEach(form => {
+                    form.style.display = 'none';
+                });
+                currentPenaltyToAdjust = { team: null, id: null };
+                break;
+                
+            case ' ': // Barre d'espace
+                // Démarrer/arrêter le temps
+                if (gameState.gameStarted) {
+                    event.preventDefault(); // Empêcher le défilement de la page
+                    toggleTimer();
+                }
+                break;
+                
+            case 'ArrowLeft':
+                // Ajouter un but à l'équipe de gauche (équipe 1)
+                if (gameState.gameStarted) {
+                    event.preventDefault();
+                    addGoal(1);
+                }
+                break;
+                
+            case 'ArrowRight':
+                // Ajouter un but à l'équipe de droite (équipe 2)
+                if (gameState.gameStarted) {
+                    event.preventDefault();
+                    addGoal(2);
+                }
+                break;
+        }
     });
-
-    // Empêcher la propagation des clics/touches dans les formulaires
-    const forms = document.querySelectorAll('.penalty-form, .time-adjust-form');
-    forms.forEach(form => {
-        const stopPropagation = function(event) {
-            event.stopPropagation();
-        };
-
-        form.addEventListener('click', stopPropagation);
-        form.addEventListener('touchend', stopPropagation);
-    });
-
+    
     // Améliorer la réactivité des boutons sur mobile
     const buttons = document.querySelectorAll('button');
     buttons.forEach(button => {
@@ -529,7 +586,16 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.opacity = '1';
         });
     });
-});
-
-// Chargement initial
-document.addEventListener('DOMContentLoaded', loadGameState); 
+    
+    // Ajouter une indication visuelle des raccourcis clavier
+    const timerButton = document.getElementById('toggleTimer');
+    if (timerButton) {
+        timerButton.setAttribute('title', 'Raccourci: Barre d\'espace');
+    }
+    
+    const addGoalButtons = document.querySelectorAll('.add-goal');
+    addGoalButtons.forEach((button, index) => {
+        const direction = index === 0 ? 'gauche' : 'droite';
+        button.setAttribute('title', `Raccourci: Flèche ${direction}`);
+    });
+}); 

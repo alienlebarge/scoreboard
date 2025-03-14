@@ -191,112 +191,143 @@ button:hover {
     background: none;
 }
 
+/* Remplacer les modales par des sections d'édition inline */
+.penalty-input,
+.time-adjust-modal,
 .penalty-adjust-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+    display: none;
+    background-color: #f8f9fa;
+    border: 2px solid #0D47A1;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: relative;
 }
 
-.penalty-input {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.penalty-form {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 300px;
-}
-
-.penalty-form h3 {
-    margin-bottom: 15px;
-    color: #1a237e;
-}
-
-.penalty-form input {
-    width: 100%;
-    margin-bottom: 10px;
-}
-
-.penalty-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
-}
-
-.time-controls {
-    display: flex;
-    justify-content: center;
-    gap: 5px;
-    margin-top: 10px;
-}
-
-.time-adjust {
-    background-color: #37474F;
-    font-size: 0.9em;
-    padding: 5px 10px;
-}
-
-.time-adjust:hover {
-    background-color: #263238;
-}
-
-.time-adjust-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
+.penalty-form,
 .time-adjust-form {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 300px;
+    background-color: transparent;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    position: relative;
 }
 
-.time-adjust-form h3 {
+.form-title {
+    font-size: 1.2em;
+    font-weight: bold;
     margin-bottom: 15px;
-    color: #1a237e;
-    text-align: center;
+    color: #0D47A1;
 }
 
-.time-inputs {
+.form-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 15px;
+    align-items: center;
 }
 
-.time-inputs input {
-    width: 50%;
+.form-group {
+    flex: 1;
+    min-width: 120px;
 }
 
-.time-adjust-buttons {
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+}
+
+.form-actions {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 10px;
 }
 
+/* Styles pour les sections d'édition spécifiques */
+.penalty-edit-section,
+.time-edit-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+/* Supprimer les styles de modal qui ne sont plus nécessaires */
+body.modal-open {
+    overflow: auto;
+    position: static;
+    width: auto;
+    height: auto;
+}
+
+.modal-container {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+}
+
+/* Amélioration de l'accessibilité */
+button:focus,
+input:focus {
+    outline: 3px solid #4A90E2;
+    outline-offset: 2px;
+}
+
+/* Styles pour les boutons d'action */
+.action-button {
+    background-color: #0D47A1;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.action-button.primary {
+    background-color: #2E7D32;
+}
+
+.action-button.secondary {
+    background-color: #757575;
+}
+
+.action-button.danger {
+    background-color: #C62828;
+}
+
+.action-button:hover {
+    opacity: 0.9;
+}
+
+/* Styles pour les messages d'état */
+.status-message {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.status-message.success {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+    border: 1px solid #A5D6A7;
+}
+
+.status-message.error {
+    background-color: #FFEBEE;
+    color: #C62828;
+    border: 1px solid #EF9A9A;
+}
+
+/* Styles pour mobile */
 @media (max-width: 768px) {
     .scoreboard {
         grid-template-columns: 1fr;
@@ -323,10 +354,9 @@ button:hover {
 
     .penalty-form,
     .time-adjust-form {
-        width: 95%;
+        padding: 15px;
         margin: 10px;
-        max-height: 90vh;
-        overflow-y: auto;
+        width: calc(100% - 20px);
     }
 
     .controls {
@@ -335,6 +365,24 @@ button:hover {
 
     .controls button {
         width: 100%;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .form-group {
+        width: 100%;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions button {
+        width: 100%;
+        margin-bottom: 10px;
     }
 
     body {
