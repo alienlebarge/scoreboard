@@ -275,13 +275,47 @@ function showTimeAdjust() {
     document.getElementById('adjustSeconds').value = gameState.timer.seconds;
 }
 
+function adjustPenaltiesTime(oldMinutes, oldSeconds, newMinutes, newSeconds) {
+    const oldTotalSeconds = oldMinutes * 60 + oldSeconds;
+    const newTotalSeconds = newMinutes * 60 + newSeconds;
+    const timeDifference = newTotalSeconds - oldTotalSeconds;
+    
+    // Ajuster les pénalités de l'équipe 1
+    gameState.team1.penalties = gameState.team1.penalties.map(penalty => {
+        // N'ajuster que si la pénalité est active (temps restant différent du temps original)
+        if (penalty.timeLeft !== penalty.originalTime) {
+            penalty.timeLeft = Math.max(0, penalty.timeLeft + timeDifference);
+        }
+        return penalty;
+    });
+    
+    // Ajuster les pénalités de l'équipe 2
+    gameState.team2.penalties = gameState.team2.penalties.map(penalty => {
+        // N'ajuster que si la pénalité est active (temps restant différent du temps original)
+        if (penalty.timeLeft !== penalty.originalTime) {
+            penalty.timeLeft = Math.max(0, penalty.timeLeft + timeDifference);
+        }
+        return penalty;
+    });
+}
+
 function confirmTimeAdjust() {
     const minutes = parseInt(document.getElementById('adjustMinutes').value);
     const seconds = parseInt(document.getElementById('adjustSeconds').value);
     
     if (!isNaN(minutes) && !isNaN(seconds) && minutes >= 0 && seconds >= 0 && seconds < 60) {
+        // Ajuster les pénalités avant de changer le temps
+        adjustPenaltiesTime(
+            gameState.timer.minutes,
+            gameState.timer.seconds,
+            minutes,
+            seconds
+        );
+        
+        // Mettre à jour le temps
         gameState.timer.minutes = minutes;
         gameState.timer.seconds = seconds;
+        
         document.getElementById('timeAdjustModal').style.display = 'none';
         updateUI();
         saveGameState();
