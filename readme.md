@@ -6,13 +6,13 @@ No problem, use this one with any browser and project it on any wall using a bea
 ## Features
 
 ### Multi-sport Support
-- Presets intégrés : Football, Hockey, Basketball, Handball
-- Mode personnalisé pour tout autre sport
-- Nombre de périodes configurable (mi-temps, tiers, quarts, etc.)
-- Durée par période ajustable
-- Chronomètre en décompte ou montant
-- Incréments de score configurables (ex. +1/+2/+3 pour le basketball)
-- Activation/désactivation des pénalités selon le sport
+- Built-in presets: Football, Hockey, Basketball, Handball
+- Custom mode for any other sport
+- Configurable number of periods (halves, thirds, quarters, etc.)
+- Adjustable duration per period
+- Count-down or count-up timer
+- Configurable score increments (e.g. +1/+2/+3 for basketball)
+- Enable/disable penalties depending on the sport
 
 ### Game Setup
 - Set custom team names
@@ -40,6 +40,14 @@ No problem, use this one with any browser and project it on any wall using a bea
 - Automatic switch between periods (supports N periods)
 - Count-up or count-down timer
 - End of game detection and celebration
+
+### Projection Mode
+- Dark theme automatically activates when a game starts
+- Maximized scores, timer, and team names for beamer readability
+- Configuration panel hidden during the game
+- Discrete controls (semi-transparent buttons) to avoid visual clutter
+- Reset button available to return to configuration
+- Responsive dark mode for mobile devices
 
 ### Data Persistence
 - All game data is automatically saved
