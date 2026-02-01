@@ -13,12 +13,12 @@
     <!-- Conteneur principal -->
     <div class="container" role="main">
         <h1>Tableau des Scores</h1>
-        
+
         <!-- Section de configuration initiale du match -->
         <section class="configuration" aria-labelledby="config-title">
             <!-- Titre caché visuellement mais accessible aux lecteurs d'écran -->
             <h2 id="config-title" class="sr-only">Configuration du match</h2>
-            
+
             <!-- Configuration des équipes -->
             <div class="team-config">
                 <div>
@@ -30,11 +30,62 @@
                     <input type="text" id="team2" placeholder="Nom de l'équipe 2" aria-required="true">
                 </div>
             </div>
-            
-            <!-- Configuration du temps et contrôles principaux -->
+
+            <!-- Sélection du sport -->
+            <div class="sport-config">
+                <label for="sportPreset">Sport :</label>
+                <select id="sportPreset" aria-label="Sélectionner un sport">
+                    <option value="hockey" selected>Hockey</option>
+                    <option value="football">Football</option>
+                    <option value="basketball">Basketball</option>
+                    <option value="handball">Handball</option>
+                    <option value="custom">Personnalisé</option>
+                </select>
+            </div>
+
+            <!-- Configuration avancée -->
+            <div class="advanced-config">
+                <div class="config-row">
+                    <div class="config-field">
+                        <label for="configPeriods">Nombre de périodes :</label>
+                        <input type="number" id="configPeriods" value="3" min="1" aria-required="true">
+                    </div>
+                    <div class="config-field">
+                        <label for="configDuration">Durée par période (min) :</label>
+                        <input type="number" id="configDuration" value="20" min="1" aria-required="true">
+                    </div>
+                    <div class="config-field">
+                        <label for="configPeriodName">Nom de la période :</label>
+                        <input type="text" id="configPeriodName" value="Tiers">
+                    </div>
+                </div>
+                <div class="config-row">
+                    <div class="config-field">
+                        <label for="configScoreName">Nom du score :</label>
+                        <input type="text" id="configScoreName" value="But">
+                    </div>
+                    <div class="config-field">
+                        <label for="configIncrements">Incréments (séparés par virgules) :</label>
+                        <input type="text" id="configIncrements" value="1">
+                    </div>
+                    <div class="config-field">
+                        <label for="configTimerDirection">Direction du chrono :</label>
+                        <select id="configTimerDirection" aria-label="Direction du chronomètre">
+                            <option value="down" selected>Décompte</option>
+                            <option value="up">Montant</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="config-row">
+                    <div class="config-field config-checkbox">
+                        <input type="checkbox" id="configPenalties" checked>
+                        <label for="configPenalties">Pénalités activées</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Boutons de contrôle -->
             <div class="time-config">
-                <label for="halfTime">Durée mi-temps (minutes) :</label>
-                <input type="number" id="halfTime" value="45" min="1" aria-required="true">
                 <button onclick="startGame()" aria-label="Démarrer le match">Démarrer le Match</button>
                 <button onclick="resetGame()" class="reset-button" aria-label="Réinitialiser toutes les données">Réinitialiser</button>
             </div>
@@ -51,8 +102,8 @@
                     <button onclick="addGoal(1)" class="add-goal" aria-label="Ajouter un but à l'équipe 1">+ But</button>
                     <button onclick="togglePenaltyForm(1)" aria-label="Ajouter une pénalité à l'équipe 1">+ Pénalité</button>
                 </div>
-                
-                <!-- Formulaire d'ajout de pénalité pour l'équipe 1 (remplace la modale) -->
+
+                <!-- Formulaire d'ajout de pénalité pour l'équipe 1 -->
                 <div class="penalty-input" id="penaltyInput1" aria-labelledby="penaltyTitle1">
                     <div class="penalty-form">
                         <h3 id="penaltyTitle1" class="form-title">Ajouter une pénalité - Équipe 1</h3>
@@ -72,10 +123,10 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Zone d'affichage des pénalités de l'équipe 1 -->
                 <div class="penalties" id="penalties1" role="list" aria-label="Liste des pénalités équipe 1"></div>
-                
+
                 <!-- Formulaire d'ajustement de pénalité pour l'équipe 1 -->
                 <div class="penalty-adjust-modal" id="penaltyAdjustForm1" aria-labelledby="penaltyAdjustTitle1">
                     <div class="penalty-form">
@@ -100,14 +151,14 @@
 
             <!-- Zone centrale avec chronomètre et contrôles du match -->
             <div class="match-info" role="region" aria-label="Informations du match">
-                <div class="timer" id="timer" role="timer" aria-label="Temps restant">45:00</div>
-                <div class="period" id="period" aria-live="polite">1ère Mi-temps</div>
+                <div class="timer" id="timer" role="timer" aria-label="Temps restant">20:00</div>
+                <div class="period" id="period" aria-live="polite">1ère Tiers</div>
                 <button id="toggleTimer" onclick="toggleTimer()" aria-label="Démarrer ou mettre en pause le chronomètre">Démarrer</button>
                 <div class="time-controls">
                     <button onclick="toggleTimeAdjustForm()" class="time-adjust" aria-label="Afficher/masquer le formulaire d'ajustement du temps">Ajuster le temps</button>
                 </div>
-                
-                <!-- Formulaire d'ajustement du temps (remplace la modale) -->
+
+                <!-- Formulaire d'ajustement du temps -->
                 <div class="time-adjust-modal" id="timeAdjustForm" aria-labelledby="timeAdjustTitle">
                     <div class="time-adjust-form">
                         <h3 id="timeAdjustTitle" class="form-title">Ajuster le temps</h3>
@@ -138,7 +189,7 @@
                     <button onclick="addGoal(2)" class="add-goal" aria-label="Ajouter un but à l'équipe 2">+ But</button>
                     <button onclick="togglePenaltyForm(2)" aria-label="Ajouter une pénalité à l'équipe 2">+ Pénalité</button>
                 </div>
-                
+
                 <!-- Formulaire d'ajout de pénalité pour l'équipe 2 -->
                 <div class="penalty-input" id="penaltyInput2" aria-labelledby="penaltyTitle2">
                     <div class="penalty-form">
@@ -159,9 +210,9 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="penalties" id="penalties2" role="list" aria-label="Liste des pénalités équipe 2"></div>
-                
+
                 <!-- Formulaire d'ajustement de pénalité pour l'équipe 2 -->
                 <div class="penalty-adjust-modal" id="penaltyAdjustForm2" aria-labelledby="penaltyAdjustTitle2">
                     <div class="penalty-form">
@@ -192,4 +243,4 @@
     <!-- Script principal de l'application -->
     <script src="assets/scripts/script.js"></script>
 </body>
-</html> 
+</html>

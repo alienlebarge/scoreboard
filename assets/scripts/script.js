@@ -1,3 +1,59 @@
+// Presets de sports
+const SPORT_PRESETS = {
+    football: {
+        periods: 2,
+        periodDuration: 45,
+        periodName: 'Mi-temps',
+        scoreName: 'But',
+        scoreIncrements: [1],
+        penaltiesEnabled: false,
+        defaultPenaltyDuration: 2,
+        timerDirection: 'down'
+    },
+    hockey: {
+        periods: 3,
+        periodDuration: 20,
+        periodName: 'Tiers',
+        scoreName: 'But',
+        scoreIncrements: [1],
+        penaltiesEnabled: true,
+        defaultPenaltyDuration: 2,
+        timerDirection: 'down'
+    },
+    basketball: {
+        periods: 4,
+        periodDuration: 10,
+        periodName: 'Quart',
+        scoreName: 'Panier',
+        scoreIncrements: [1, 2, 3],
+        penaltiesEnabled: false,
+        defaultPenaltyDuration: 2,
+        timerDirection: 'down'
+    },
+    handball: {
+        periods: 2,
+        periodDuration: 30,
+        periodName: 'Mi-temps',
+        scoreName: 'But',
+        scoreIncrements: [1],
+        penaltiesEnabled: true,
+        defaultPenaltyDuration: 2,
+        timerDirection: 'down'
+    },
+    custom: {
+        periods: 2,
+        periodDuration: 20,
+        periodName: 'Période',
+        scoreName: 'Point',
+        scoreIncrements: [1],
+        penaltiesEnabled: true,
+        defaultPenaltyDuration: 2,
+        timerDirection: 'down'
+    }
+};
+
+const DEFAULT_CONFIG = { ...SPORT_PRESETS.hockey };
+
 // État global du jeu
 let gameState = {
     team1: {
@@ -11,12 +67,13 @@ let gameState = {
         penalties: []
     },
     timer: {
-        minutes: 45,
+        minutes: 20,
         seconds: 0,
         isRunning: false,
-        halfTime: 45,
+        halfTime: 20,
         period: 1
     },
+    config: { ...DEFAULT_CONFIG },
     gameStarted: false
 };
 
@@ -68,12 +125,13 @@ function resetGame() {
                 penalties: []
             },
             timer: {
-                minutes: 45,
+                minutes: 20,
                 seconds: 0,
                 isRunning: false,
-                halfTime: 45,
+                halfTime: 20,
                 period: 1
             },
+            config: { ...DEFAULT_CONFIG },
             gameStarted: false
         };
 
@@ -83,7 +141,17 @@ function resetGame() {
         // Réinitialiser les champs de saisie
         document.getElementById('team1').value = '';
         document.getElementById('team2').value = '';
-        document.getElementById('halfTime').value = '45';
+
+        // Réinitialiser le dropdown et les champs config
+        const presetSelect = document.getElementById('sportPreset');
+        if (presetSelect) {
+            presetSelect.value = 'hockey';
+            populateConfigFields(SPORT_PRESETS.hockey);
+        }
+
+        // Reconstruire les contrôles par défaut
+        buildScoreControls();
+        applyPenaltyVisibility();
 
         // Mettre à jour l'interface
         updateUI();
@@ -98,7 +166,28 @@ function loadGameState() {
             const parsed = JSON.parse(savedState);
             // Vérifier que la structure est valide
             if (parsed && parsed.team1 && parsed.team2 && parsed.timer) {
+                // Migration : ajouter config si absente
+                if (!parsed.config) {
+                    parsed.config = { ...DEFAULT_CONFIG };
+                    // Inférer periodDuration depuis halfTime
+                    if (parsed.timer.halfTime) {
+                        parsed.config.periodDuration = parsed.timer.halfTime;
+                    }
+                } else {
+                    // Compléter les clés manquantes depuis DEFAULT_CONFIG
+                    for (const key of Object.keys(DEFAULT_CONFIG)) {
+                        if (parsed.config[key] === undefined) {
+                            parsed.config[key] = DEFAULT_CONFIG[key];
+                        }
+                    }
+                }
                 gameState = parsed;
+
+                // Si le match est en cours, reconstruire les contrôles
+                if (gameState.gameStarted) {
+                    buildScoreControls();
+                    applyPenaltyVisibility();
+                }
             }
         } catch (e) {
             localStorage.removeItem('scoreboardState');
@@ -110,6 +199,15 @@ function loadGameState() {
 // Sauvegarde de l'état
 function saveGameState() {
     localStorage.setItem('scoreboardState', JSON.stringify(gameState));
+}
+
+// Générer le label de période
+function getPeriodLabel(periodNumber, config) {
+    const name = config.periodName;
+    if (periodNumber === 1) {
+        return '1ère ' + name;
+    }
+    return periodNumber + 'ème ' + name;
 }
 
 // Mise à jour de l'interface utilisateur
@@ -127,7 +225,7 @@ function updateUI() {
     // Mise à jour du timer
     const formattedTime = `${String(gameState.timer.minutes).padStart(2, '0')}:${String(gameState.timer.seconds).padStart(2, '0')}`;
     document.getElementById('timer').textContent = formattedTime;
-    document.getElementById('period').textContent = gameState.timer.period === 1 ? '1ère Mi-temps' : '2ème Mi-temps';
+    document.getElementById('period').textContent = getPeriodLabel(gameState.timer.period, gameState.config);
 
     // Mise à jour du bouton timer
     document.getElementById('toggleTimer').textContent = gameState.timer.isRunning ? 'Pause' : 'Démarrer';
@@ -142,29 +240,54 @@ let timerInterval;
 function startTimer() {
     if (!timerInterval) {
         timerInterval = setInterval(() => {
-            // Décompte du chronomètre principal
-            if (gameState.timer.seconds === 0) {
-                if (gameState.timer.minutes === 0) {
+            const config = gameState.config;
+
+            if (config.timerDirection === 'down') {
+                // Décompte
+                if (gameState.timer.seconds === 0) {
+                    if (gameState.timer.minutes === 0) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        gameState.timer.isRunning = false;
+                        if (gameState.timer.period < config.periods) {
+                            startNextPeriod();
+                        } else {
+                            endGame();
+                        }
+                        updateUI();
+                        saveGameState();
+                        return;
+                    } else {
+                        gameState.timer.minutes--;
+                        gameState.timer.seconds = 59;
+                    }
+                } else {
+                    gameState.timer.seconds--;
+                }
+            } else {
+                // Count-up
+                gameState.timer.seconds++;
+                if (gameState.timer.seconds >= 60) {
+                    gameState.timer.seconds = 0;
+                    gameState.timer.minutes++;
+                }
+                // Vérifier si la durée de période est atteinte
+                if (gameState.timer.minutes >= config.periodDuration && gameState.timer.seconds === 0) {
                     clearInterval(timerInterval);
                     timerInterval = null;
                     gameState.timer.isRunning = false;
-                    if (gameState.timer.period === 1) {
-                        startSecondHalf();
+                    if (gameState.timer.period < config.periods) {
+                        startNextPeriod();
                     } else {
                         endGame();
                     }
                     updateUI();
                     saveGameState();
                     return;
-                } else {
-                    gameState.timer.minutes--;
-                    gameState.timer.seconds = 59;
                 }
-            } else {
-                gameState.timer.seconds--;
             }
 
-            // Décompte des pénalités dans le même intervalle
+            // Décompte des pénalités (toujours vers le bas)
             [gameState.team1.penalties, gameState.team2.penalties].forEach(penalties => {
                 penalties.forEach(penalty => {
                     if (penalty.timeLeft > 0) {
@@ -225,37 +348,96 @@ function fireConfetti(options) {
     }
 }
 
-// Gestion des buts
-function addGoal(team) {
+// Gestion des buts avec incrément configurable
+function addGoal(team, increment) {
     if (!gameState.gameStarted) {
         showNotification('Veuillez démarrer le match d\'abord.');
         return;
     }
 
+    increment = increment || 1;
+
     if (team === 1) {
-        gameState.team1.score++;
+        gameState.team1.score += increment;
         fireConfetti({ particleCount: 100, spread: 70, origin: { x: 0.3 } });
     } else {
-        gameState.team2.score++;
+        gameState.team2.score += increment;
         fireConfetti({ particleCount: 100, spread: 70, origin: { x: 0.7 } });
     }
     updateUI();
     saveGameState();
 }
 
-function removeGoal(team) {
+function removeGoal(team, increment) {
     if (!gameState.gameStarted) {
         showNotification('Veuillez démarrer le match d\'abord.');
         return;
     }
 
-    if (team === 1 && gameState.team1.score > 0) {
-        gameState.team1.score--;
-    } else if (team === 2 && gameState.team2.score > 0) {
-        gameState.team2.score--;
+    increment = increment || 1;
+
+    if (team === 1) {
+        gameState.team1.score = Math.max(0, gameState.team1.score - increment);
+    } else {
+        gameState.team2.score = Math.max(0, gameState.team2.score - increment);
     }
     updateUI();
     saveGameState();
+}
+
+// Construire dynamiquement les boutons de score
+function buildScoreControls() {
+    const config = gameState.config;
+    const scoreName = config.scoreName;
+    const increments = config.scoreIncrements;
+
+    [1, 2].forEach(team => {
+        const container = document.querySelector(`.team${team} .controls`);
+        if (!container) return;
+        container.innerHTML = '';
+
+        // Boutons de retrait
+        increments.forEach(inc => {
+            const btn = document.createElement('button');
+            btn.className = 'remove-goal';
+            btn.setAttribute('aria-label', `Retirer ${inc} ${scoreName} à l'équipe ${team}`);
+            btn.textContent = `- ${inc} ${scoreName}`;
+            btn.addEventListener('click', function() { removeGoal(team, inc); });
+            container.appendChild(btn);
+        });
+
+        // Boutons d'ajout
+        increments.forEach(inc => {
+            const btn = document.createElement('button');
+            btn.className = 'add-goal';
+            btn.setAttribute('aria-label', `Ajouter ${inc} ${scoreName} à l'équipe ${team}`);
+            btn.textContent = `+ ${inc} ${scoreName}`;
+            btn.addEventListener('click', function() { addGoal(team, inc); });
+            container.appendChild(btn);
+        });
+
+        // Bouton pénalité (seulement si activé)
+        if (config.penaltiesEnabled) {
+            const penBtn = document.createElement('button');
+            penBtn.setAttribute('aria-label', `Ajouter une pénalité à l'équipe ${team}`);
+            penBtn.textContent = '+ Pénalité';
+            penBtn.addEventListener('click', function() { togglePenaltyForm(team); });
+            container.appendChild(penBtn);
+        }
+    });
+}
+
+// Appliquer la visibilité des pénalités
+function applyPenaltyVisibility() {
+    const config = gameState.config;
+    const penaltyElements = document.querySelectorAll('.penalty-input, .penalties, .penalty-adjust-modal');
+    penaltyElements.forEach(el => {
+        if (config.penaltiesEnabled) {
+            el.classList.remove('penalties-hidden');
+        } else {
+            el.classList.add('penalties-hidden');
+        }
+    });
 }
 
 // Gestion des pénalités
@@ -277,7 +459,7 @@ function togglePenaltyForm(team) {
 
         // Réinitialiser et afficher le formulaire
         document.getElementById(`playerNumber${team}`).value = '';
-        document.getElementById(`penaltyTime${team}`).value = '2';
+        document.getElementById(`penaltyTime${team}`).value = gameState.config.defaultPenaltyDuration;
         penaltyForm.style.display = 'block';
 
         // Focus sur le premier champ pour l'accessibilité
@@ -322,8 +504,8 @@ function updatePenaltiesDisplay() {
             div.className = 'penalty';
             div.innerHTML = `
                 <span>#${penalty.player} - ${minutes}:${String(seconds).padStart(2, '0')}</span>
-                <button type="button" class="adjust-penalty" aria-label="Ajuster la pénalité">⚙️</button>
-                <button type="button" class="remove-penalty" aria-label="Supprimer la pénalité">❌</button>
+                <button type="button" class="adjust-penalty" aria-label="Ajuster la pénalité">&#9881;&#65039;</button>
+                <button type="button" class="remove-penalty" aria-label="Supprimer la pénalité">&#10060;</button>
             `;
 
             div.querySelector('.adjust-penalty').addEventListener('click', function() {
@@ -393,8 +575,9 @@ function adjustPenaltiesTime(oldMinutes, oldSeconds, newMinutes, newSeconds) {
 function confirmTimeAdjust() {
     const minutes = parseInt(document.getElementById('adjustMinutes').value);
     const seconds = parseInt(document.getElementById('adjustSeconds').value);
+    const maxMinutes = gameState.config.periodDuration;
 
-    if (!isNaN(minutes) && !isNaN(seconds) && minutes >= 0 && seconds >= 0 && seconds < 60 && minutes <= gameState.timer.halfTime) {
+    if (!isNaN(minutes) && !isNaN(seconds) && minutes >= 0 && seconds >= 0 && seconds < 60 && minutes <= maxMinutes) {
         adjustPenaltiesTime(
             gameState.timer.minutes,
             gameState.timer.seconds,
@@ -473,39 +656,97 @@ function confirmPenaltyTimeAdjust(team) {
     }
 }
 
+// Remplir les champs de configuration depuis un preset
+function populateConfigFields(preset) {
+    document.getElementById('configPeriods').value = preset.periods;
+    document.getElementById('configDuration').value = preset.periodDuration;
+    document.getElementById('configPeriodName').value = preset.periodName;
+    document.getElementById('configScoreName').value = preset.scoreName;
+    document.getElementById('configIncrements').value = preset.scoreIncrements.join(', ');
+    document.getElementById('configTimerDirection').value = preset.timerDirection;
+    document.getElementById('configPenalties').checked = preset.penaltiesEnabled;
+}
+
+// Lire la configuration depuis le formulaire
+function readConfigFromForm() {
+    const periods = parseInt(document.getElementById('configPeriods').value) || 2;
+    const periodDuration = parseInt(document.getElementById('configDuration').value) || 20;
+    const periodName = document.getElementById('configPeriodName').value.trim() || 'Période';
+    const scoreName = document.getElementById('configScoreName').value.trim() || 'Point';
+    const incrementsStr = document.getElementById('configIncrements').value;
+    const scoreIncrements = incrementsStr.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0);
+    const timerDirection = document.getElementById('configTimerDirection').value;
+    const penaltiesEnabled = document.getElementById('configPenalties').checked;
+
+    return {
+        periods: Math.max(1, periods),
+        periodDuration: Math.max(1, periodDuration),
+        periodName: periodName,
+        scoreName: scoreName,
+        scoreIncrements: scoreIncrements.length > 0 ? scoreIncrements : [1],
+        penaltiesEnabled: penaltiesEnabled,
+        defaultPenaltyDuration: 2,
+        timerDirection: timerDirection
+    };
+}
+
+// Handler du changement de preset
+function onPresetChange() {
+    const presetKey = document.getElementById('sportPreset').value;
+    const preset = SPORT_PRESETS[presetKey];
+    if (preset) {
+        populateConfigFields(preset);
+    }
+}
+
 // Gestion du match
 function startGame() {
     const team1Name = document.getElementById('team1').value.trim();
     const team2Name = document.getElementById('team2').value.trim();
-    const halfTime = parseInt(document.getElementById('halfTime').value);
+    const config = readConfigFromForm();
 
-    if (isNaN(halfTime) || halfTime <= 0) {
-        alert('Veuillez entrer une durée de mi-temps valide');
+    if (config.periodDuration <= 0) {
+        alert('Veuillez entrer une durée de période valide');
         return;
     }
+
+    const timerMinutes = config.timerDirection === 'down' ? config.periodDuration : 0;
 
     gameState = {
         team1: { name: team1Name, score: 0, penalties: [] },
         team2: { name: team2Name, score: 0, penalties: [] },
         timer: {
-            minutes: halfTime,
+            minutes: timerMinutes,
             seconds: 0,
             isRunning: false,
-            halfTime: halfTime,
+            halfTime: config.periodDuration,
             period: 1
         },
+        config: config,
         gameStarted: true
     };
 
+    buildScoreControls();
+    applyPenaltyVisibility();
     updateUI();
     saveGameState();
 }
 
-function startSecondHalf() {
-    gameState.timer.minutes = gameState.timer.halfTime;
-    gameState.timer.seconds = 0;
-    gameState.timer.period = 2;
+function startNextPeriod() {
+    const config = gameState.config;
+    gameState.timer.period++;
+    if (config.timerDirection === 'down') {
+        gameState.timer.minutes = config.periodDuration;
+        gameState.timer.seconds = 0;
+    } else {
+        gameState.timer.minutes = 0;
+        gameState.timer.seconds = 0;
+    }
     gameState.timer.isRunning = false;
+
+    const label = getPeriodLabel(gameState.timer.period, config);
+    showNotification('Début : ' + label);
+
     updateUI();
     saveGameState();
 }
@@ -523,6 +764,13 @@ function endGame() {
 document.addEventListener('DOMContentLoaded', function() {
     // Charger l'état du jeu
     loadGameState();
+
+    // Remplir les champs de config avec le preset par défaut
+    const presetSelect = document.getElementById('sportPreset');
+    if (presetSelect) {
+        populateConfigFields(SPORT_PRESETS[presetSelect.value] || DEFAULT_CONFIG);
+        presetSelect.addEventListener('change', onPresetChange);
+    }
 
     // Cacher tous les formulaires au démarrage
     document.querySelectorAll('.penalty-input, .penalty-adjust-modal, .time-adjust-modal').forEach(form => {

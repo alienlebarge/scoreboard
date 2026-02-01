@@ -45,6 +45,78 @@ h1 {
     margin: 0 10px;
 }
 
+/* Sélection du sport */
+.sport-config {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.sport-config select {
+    flex: 1;
+    max-width: 300px;
+}
+
+/* Configuration avancée */
+.advanced-config {
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.config-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.config-row:last-child {
+    margin-bottom: 0;
+}
+
+.config-field {
+    flex: 1;
+    min-width: 180px;
+}
+
+.config-field label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.9em;
+}
+
+.config-field input,
+.config-field select {
+    width: 100%;
+}
+
+.config-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-direction: row;
+}
+
+.config-checkbox input[type="checkbox"] {
+    width: auto;
+    min-height: auto;
+    margin: 0;
+}
+
+.config-checkbox label {
+    display: inline;
+    margin-bottom: 0;
+}
+
+/* Masquer les pénalités */
+.penalties-hidden {
+    display: none !important;
+}
+
 .time-config {
     display: flex;
     flex-wrap: wrap;
@@ -52,12 +124,19 @@ h1 {
     align-items: center;
 }
 
-input {
+input, select {
     padding: 8px;
     border: 2px solid #757575;
     border-radius: 4px;
     margin: 5px;
     width: 200px;
+    font-size: 1em;
+    background-color: white;
+}
+
+select {
+    cursor: pointer;
+    appearance: auto;
 }
 
 button {
@@ -260,7 +339,8 @@ button:hover {
 
 /* Amélioration de l'accessibilité */
 button:focus,
-input:focus {
+input:focus,
+select:focus {
     outline: 3px solid #4A90E2;
     outline-offset: 2px;
 }
@@ -327,6 +407,23 @@ input:focus {
         grid-template-columns: 1fr;
     }
 
+    .sport-config {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sport-config select {
+        max-width: 100%;
+    }
+
+    .config-row {
+        flex-direction: column;
+    }
+
+    .config-field {
+        min-width: 100%;
+    }
+
     .time-config {
         flex-direction: column;
         align-items: stretch;
@@ -356,15 +453,15 @@ input:focus {
         flex-direction: column;
         gap: 15px;
     }
-    
+
     .form-group {
         width: 100%;
     }
-    
+
     .form-actions {
         flex-direction: column;
     }
-    
+
     .form-actions button {
         width: 100%;
         margin-bottom: 10px;
@@ -409,7 +506,8 @@ label {
     font-weight: 500;
 }
 
-input:focus {
+input:focus,
+select:focus {
     border-color: #0D47A1;
     box-shadow: 0 0 0 2px rgba(13, 71, 161, 0.2);
 }
@@ -435,7 +533,7 @@ input:focus {
         margin: 5px 0;
     }
 
-    input {
+    input, select {
         min-height: 44px;
     }
 
@@ -462,4 +560,4 @@ input:focus {
         align-items: center;
         justify-content: center;
     }
-} 
+}
