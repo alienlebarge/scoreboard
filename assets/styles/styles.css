@@ -258,21 +258,6 @@ button:hover {
     border-top: 1px solid #ddd;
 }
 
-/* Supprimer les styles de modal qui ne sont plus nécessaires */
-body.modal-open {
-    overflow: auto;
-    position: static;
-    width: auto;
-    height: auto;
-}
-
-.modal-container {
-    position: static;
-    width: auto;
-    height: auto;
-    overflow: visible;
-}
-
 /* Amélioration de l'accessibilité */
 button:focus,
 input:focus {
@@ -434,55 +419,6 @@ input:focus {
     color: #C62828;
     font-weight: bold;
     margin-top: 5px;
-}
-
-/* Styles pour éviter les problèmes de défilement sur mobile */
-body.modal-open {
-    overflow: hidden;
-    height: 100vh;
-    touch-action: none;
-}
-
-.modal-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    z-index: 1000;
-}
-
-/* Mise à jour des styles des modales */
-.penalty-input,
-.time-adjust-modal,
-.penalty-adjust-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.7);
-    display: none;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 20px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    z-index: 1000;
-}
-
-.penalty-form,
-.time-adjust-form {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 400px;
-    margin: 20px auto;
-    position: relative;
-    touch-action: manipulation;
 }
 
 /* Amélioration de la taille des boutons pour mobile */
