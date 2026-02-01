@@ -472,6 +472,201 @@ select:focus {
     }
 }
 
+/* Bouton réinitialiser en projection — caché par défaut */
+.reset-projection {
+    display: none;
+}
+
+/* ===== Mode projection (game-active) ===== */
+.game-active {
+    background-color: #111;
+    color: #fff;
+}
+
+.game-active .configuration {
+    display: none;
+}
+
+.game-active h1 {
+    display: none;
+}
+
+.game-active .scoreboard {
+    grid-template-columns: 1fr auto 1fr;
+    align-items: start;
+    min-height: 90vh;
+    gap: 10px;
+    margin-top: 0;
+    padding-top: 10vh;
+}
+
+.game-active .team h2 {
+    font-size: 4vw;
+    color: #fff;
+}
+
+.game-active .score {
+    font-size: 18vw;
+    color: #fff;
+    line-height: 1;
+    margin: 10px 0;
+}
+
+.game-active .timer {
+    font-size: 10vw;
+    color: #4FC3F7;
+    margin-bottom: 5px;
+}
+
+.game-active .period {
+    font-size: 2.5vw;
+    color: #B0BEC5;
+}
+
+.game-active .controls button {
+    opacity: 0.7;
+    font-size: 0.85em;
+    padding: 6px 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.game-active .controls button:hover {
+    opacity: 1;
+}
+
+.game-active .controls .add-goal {
+    background-color: rgba(46, 125, 50, 0.6);
+}
+
+.game-active .controls .remove-goal {
+    background-color: rgba(198, 40, 40, 0.6);
+}
+
+.game-active .penalties {
+    font-size: 1.8vw;
+    color: #FFCDD2;
+}
+
+.game-active .penalty {
+    font-size: 1.5vw;
+}
+
+.game-active .penalty button {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.game-active .match-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-active .time-controls button {
+    opacity: 0.7;
+    font-size: 0.85em;
+    padding: 6px 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.game-active .time-controls button:hover {
+    opacity: 1;
+}
+
+.game-active #toggleTimer {
+    opacity: 1;
+    font-size: 1em;
+    padding: 10px 20px;
+    background-color: #0D47A1;
+    border: none;
+}
+
+.game-active #toggleTimer:hover {
+    background-color: #1565C0;
+}
+
+.game-active .reset-projection {
+    display: inline-block;
+    opacity: 0.5;
+    font-size: 0.8em;
+    padding: 6px 14px;
+    background-color: rgba(198, 40, 40, 0.4);
+    border: 1px solid rgba(198, 40, 40, 0.5);
+    margin-top: 5px;
+}
+
+.game-active .reset-projection:hover {
+    opacity: 1;
+    background-color: rgba(198, 40, 40, 0.7);
+}
+
+/* Formulaires inline en mode projection */
+.game-active .penalty-input,
+.game-active .time-adjust-modal,
+.game-active .penalty-adjust-modal {
+    background-color: #1a1a2e;
+    border-color: #4FC3F7;
+    color: #fff;
+}
+
+.game-active .penalty-input .form-title,
+.game-active .time-adjust-modal .form-title,
+.game-active .penalty-adjust-modal .form-title {
+    color: #4FC3F7;
+}
+
+.game-active .penalty-input input,
+.game-active .time-adjust-modal input,
+.game-active .penalty-adjust-modal input {
+    background-color: #2a2a3e;
+    color: #fff;
+    border-color: #4FC3F7;
+}
+
+.game-active .penalty-input label,
+.game-active .time-adjust-modal label,
+.game-active .penalty-adjust-modal label {
+    color: #B0BEC5;
+}
+
+.game-active button.action-button.secondary {
+    background-color: rgba(117, 117, 117, 0.6);
+}
+
+/* Mode projection responsive mobile */
+@media (max-width: 768px) {
+    .game-active .scoreboard {
+        grid-template-columns: 1fr;
+        min-height: auto;
+    }
+
+    .game-active .score {
+        font-size: 25vw;
+    }
+
+    .game-active .timer {
+        font-size: 15vw;
+    }
+
+    .game-active .team h2 {
+        font-size: 6vw;
+    }
+
+    .game-active .period {
+        font-size: 4vw;
+    }
+
+    .game-active .penalties {
+        font-size: 3.5vw;
+    }
+
+    .game-active .penalty {
+        font-size: 3vw;
+    }
+}
+
 /* Styles pour les lecteurs d'écran */
 .sr-only {
     position: absolute;

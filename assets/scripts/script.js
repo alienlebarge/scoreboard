@@ -135,6 +135,8 @@ function resetGame() {
             gameStarted: false
         };
 
+        document.body.classList.remove('game-active');
+
         // Effacer le localStorage
         localStorage.removeItem('scoreboardState');
 
@@ -183,8 +185,9 @@ function loadGameState() {
                 }
                 gameState = parsed;
 
-                // Si le match est en cours, reconstruire les contrôles
+                // Si le match est en cours, reconstruire les contrôles et activer le mode projection
                 if (gameState.gameStarted) {
+                    document.body.classList.add('game-active');
                     buildScoreControls();
                     applyPenaltyVisibility();
                 }
@@ -726,6 +729,7 @@ function startGame() {
         gameStarted: true
     };
 
+    document.body.classList.add('game-active');
     buildScoreControls();
     applyPenaltyVisibility();
     updateUI();
